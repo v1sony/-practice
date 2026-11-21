@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProductCard</class>
+ <widget class="QDialog" name="ProductCard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>540</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>540</width>
+    <height>560</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Объявление</string>
+  </property>
+  <layout class="QVBoxLayout" name="rootLayout">
+   <item>
+    <widget class="QScrollArea" name="photosScrollArea">
+     <property name="minimumSize">
+      <size>
+       <width>480</width>
+       <height>280</height>
+      </size>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="photosContainer">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>516</width>
+        <height>386</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="photosLayout"/>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="productTitleLabel">
+     <property name="text">
+      <string>Название товара</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="priceLabel">
+     <property name="text">
+      <string>Цена</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="categoryLabel">
+     <property name="text">
+      <string>Категория</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="sellerLabel">
+     <property name="text">
+      <string>Продавец</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="descriptionLabel">
+     <property name="text">
+      <string>Описание товара</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="addToCartButton">
+     <property name="text">
+      <string>Добавить в корзину</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

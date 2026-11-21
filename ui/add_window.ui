@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AddAdWindow</class>
+ <widget class="QDialog" name="AddAdWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>460</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>460</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Новое объявление</string>
+  </property>
+  <layout class="QVBoxLayout" name="rootLayout">
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>Опубликовать объявление</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="nameLabel">
+       <property name="text">
+        <string>Название</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="titleEdit"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="categoryLabel">
+       <property name="text">
+        <string>Категория</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="categoryCombo">
+       <item>
+        <property name="text">
+         <string>Для дома</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Электроника</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Одежда</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Хобби и спорт</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Другое</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="priceLabel">
+       <property name="text">
+        <string>Цена, ₽</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="priceEdit"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="descriptionLabel">
+       <property name="text">
+        <string>Описание</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPlainTextEdit" name="descriptionEdit"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="choosePhotosButton">
+     <property name="text">
+      <string>Выбрать несколько фотографий (Ctrl + щелчок)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="photosLabel">
+     <property name="text">
+      <string>Фотографии не выбраны</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="publishButton">
+     <property name="text">
+      <string>Опубликовать</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
