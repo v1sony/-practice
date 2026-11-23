@@ -55,6 +55,11 @@
        </item>
        <item>
         <property name="text">
+         <string>Автомобили</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>Электроника</string>
         </property>
        </item>

@@ -69,6 +69,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Автомобили</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Для дома</string>
          </property>
         </item>
