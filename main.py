@@ -1,8 +1,9 @@
 import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import (QApplication, QDialog, QGridLayout, QLabel, QPushButton, QMainWindow, QMessageBox, QFileDialog)
+from PyQt6.QtWidgets import (QApplication, QDialog, QFileDialog, QFrame, QLabel, QMainWindow, QMessageBox)
 
+from ad_card import Ui_AdCard
 from add_window import Ui_AddAdWindow
 from basket_window import Ui_BasketWindow
 from main_window import Ui_MainWindow
@@ -20,6 +21,8 @@ class AddWindow(QDialog):
         self.storage = storage
         self.user = user
         self.photos = []
+        self.ui.choosePhotosButton.clicked.connect(self.choose_photos)
+        self.ui.publishButton.clicked.connect(self.publish)
 
     def choose_photos(self):
         self.photos, _ = QFileDialog.getOpenFileNames(
@@ -27,11 +30,12 @@ class AddWindow(QDialog):
         self.ui.photosLabel.setText(f"Выбрано фотографий: {len(self.photos)}")
 
     def publish(self):
-        title = self.ui.titleLabel.text().strip()
+        title = self.ui.titleEdit.text().strip()
         description = self.ui.descriptionEdit.toPlainText().strip()
 
         try:
-            price = float(self.ui.priceEdit.text().replace(",", ".")or 0)
+            price_text = self.ui.priceEdit.text().strip().replace(",", ".")
+            price = float(price_text)
             if not title or not description or price < 0:
                 raise ValueError
         except ValueError:
@@ -53,12 +57,13 @@ class ProductWindow(QDialog):
         self.ui = Ui_ProductCard()
         self.ui.setupUi(self)
         self.setWindowTitle(ad["title"])
+        self.ui.productTitleLabel.setText(ad["title"])
         self.ui.priceLabel.setText(f"{ad['price']} ₽")
         self.ui.categoryLabel.setText(f"Категория: {ad['category']}")
         self.ui.sellerLabel.setText(f"Продавец: {ad['seller']}")
         self.ui.descriptionLabel.setText(ad["description"])
 
-        self.show_photos(storage, ad.get("photos_ids", ""))
+        self.show_photos(storage, ad.get("photo_ids", ""))
         if on_add_to_cart is None:
             self.ui.addToCartButton.hide()
         else:
@@ -72,22 +77,22 @@ class ProductWindow(QDialog):
             try:
                 pixmap = QPixmap()
                 pixmap.loadFromData(storage.get_photo(photo_id))
-                lable = QLabel()
-                lable.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                lable.setPixmap(pixmap.scaled(
+                label = QLabel()
+                label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                label.setPixmap(pixmap.scaled(
                     360,
                     260,
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation,
                 ))
-                self.ui.photosLayout.addWidget(lable)
+                self.ui.photosLayout.addWidget(label)
             except Exception:
                 continue
 
         if not self.ui.photosLayout.count():
-            lable = QLabel("Фотографии не добавлены")
-            lable.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.ui.photosLayout.addWidget(lable)
+            label = QLabel("Фотографии не добавлены")
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.ui.photosLayout.addWidget(label)
 
 class BasketWindow(QDialog):
     def __init__(self, storage, basket, buyer, on_ordered, parent=None):
@@ -202,6 +207,12 @@ class MainWindow(QMainWindow):
 
         self.ui.accountButton.clicked.connect(self.account_action)
         self.ui.addAdButton.clicked.connect(self.add_ad)
+        self.ui.cartButton.clicked.connect(self.open_cart)
+        self.ui.searchButton.clicked.connect(self.refresh)
+        self.ui.searchEdit.returnPressed.connect(self.refresh)
+        self.ui.categoryFilter.currentTextChanged.connect(self.refresh)
+        self.refresh()
+
 
     def account_action(self):
         if self.user:
@@ -256,27 +267,105 @@ class MainWindow(QMainWindow):
 
     def add_ad(self):
         if not self.user:
-            QMessageBox.information(self, "Нужен аккаунт", "Сначччала войдите в аккаунт")
+            QMessageBox.information(self, "Нужен аккаунт", "Сначала войдите в аккаунт.")
             self.login()
             if not self.user:
                 return
 
-            if not self.cart:
-                QMessageBox.information(self, "Корзина пуста", "Добавьте товар")
-                return
-            if not self.user:
-                self.login()
-                if not self.user:
-                    return
+        if AddWindow(self.storage, self.user, self).exec() == QDialog.DialogCode.Accepted:
+            self.refresh()
 
-            BasketWindow(self.storage, self.cart, self.user, self).exec()
+    def add_to_cart(self, ad):
+        self.cart[ad["id"]] = ad
+        self.ui.cartButton.setText(f"Корзина ({len(self.cart)})")
+
+    def open_cart(self):
+        if not self.cart:
+            QMessageBox.information(self, "Корзина пуста", "Добавьте товар")
+            return
+        if not self.user:
+            self.login()
+            if not self.user:
+                return
+
+        BasketWindow(self.storage, self.cart, self.user, self.cart_order, self).exec()
+
+    def cart_order(self):
+        self.ui.cartButton.setText(f"Корзина ({len(self.cart)})")
+        self.refresh()
+
+    def refresh(self):
+        self.clear_catalog()
+        try:
+            ads = self.storage.ads()
+        except Exception as error:
+            QMessageBox.critical(self, "Ошибка загрузки объявлений", str(error))
+            return
+
+        query = self.ui.searchEdit.text().strip().casefold()
+        category = self.ui.categoryFilter.currentText()
+        for ad in ads:
+            searchable = " ".join(str(ad.get(field, "") or "") for field in ("title", "description", "category", "seller")).casefold()
+            if query and query not in searchable:
+                continue
+            if category != "Все категории" and ad["category"] != category:
+                continue
+            self.add_ad_card(ad)
+
+    def clear_catalog(self):
+        while self.ui.adsGrid.count():
+            item = self.ui.adsGrid.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+    def add_ad_card(self, ad):
+        card = QFrame()
+        card_ui = Ui_AdCard()
+        card_ui.setupUi(card)
+        card_ui.titleLabel.setText(ad["title"])
+        card_ui.priceLabel.setText(f"{ad['price']}")
+        card_ui.categoryLabel.setText(ad["category"])
+        self.set_card_photo(card_ui.photoLabel, ad.get("photo_ids", ""))
+        card_ui.detailsButton.clicked.connect(
+            lambda checked = False, item = ad: ProductWindow(
+                self.storage, item, self.add_to_cart, self
+            ).exec()
+        )
+        index = self.ui.adsGrid.count()
+        self.ui.adsGrid.addWidget(card, index // 3, index % 3)
+
+    def set_card_photo(self, label, photo_ids):
+        first_id = next(iter(filter(None, (photo_ids or "").split(","))), None)
+        if not first_id:
+            label.setText("Фото не добавлено")
+            return
+        try:
+            pixmap = QPixmap()
+            pixmap.loadFromData(self.storage.get_photo(first_id))
+            label.setPixmap(pixmap.scaled(
+                210,
+                145,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            ))
+        except Exception:
+            label.setText("Фото недоступно")
+
+    def closeEvent(self, event):
+        self.storage.close()
+        event.accept()
+
 
 def main():
     app = QApplication(sys.argv)
     try:
         storage = Database()
     except Exception as error:
-        QMessageBox.critical(None, "Ошибка подклюения","Проверьте настройки")
+        QMessageBox.critical(
+            None,
+            "Ошибка подключения",
+            f"Проверьте настройки MySQL и MongoDB.\n{error}",
+        )
         return 1
 
     window = MainWindow(storage)

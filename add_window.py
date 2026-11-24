@@ -79,7 +79,7 @@ class Ui_AddAdWindow(object):
         self.categoryCombo.setItemText(5, _translate("AddAdWindow", "Другое"))
         self.priceLabel.setText(_translate("AddAdWindow", "Цена, ₽"))
         self.descriptionLabel.setText(_translate("AddAdWindow", "Описание"))
-        self.choosePhotosButton.setText(_translate("AddAdWindow", "Выбрать несколько фотографий (Ctrl + щелчок)"))
+        self.choosePhotosButton.setText(_translate("AddAdWindow", "Загрузите фотографии"))
         self.photosLabel.setText(_translate("AddAdWindow", "Фотографии не выбраны"))
         self.publishButton.setText(_translate("AddAdWindow", "Опубликовать"))
 

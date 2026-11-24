@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AdCard</class>
+ <widget class="QFrame" name="AdCard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>388</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>230</width>
+    <height>280</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>320</height>
+   </size>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame#AdCard { background: white; border: 1px solid #ccd8d3; border-radius: 8px; }
+QLabel { border: none; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="cardLayout">
+   <property name="spacing">
+    <number>7</number>
+   </property>
+   <property name="leftMargin">
+    <number>8</number>
+   </property>
+   <property name="topMargin">
+    <number>8</number>
+   </property>
+   <property name="rightMargin">
+    <number>8</number>
+   </property>
+   <property name="bottomMargin">
+    <number>8</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="photoLabel">
+     <property name="minimumSize">
+      <size>
+       <width>210</width>
+       <height>145</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>150</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Фото не добавлено</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold; font-size: 14px;</string>
+     </property>
+     <property name="text">
+      <string>Название объявления</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="priceLabel">
+     <property name="styleSheet">
+      <string notr="true">font-size: 16px; font-weight: bold; color: #8B0000</string>
+     </property>
+     <property name="text">
+      <string>0 ₽</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="categoryLabel">
+     <property name="styleSheet">
+      <string notr="true">color: #66736e;</string>
+     </property>
+     <property name="text">
+      <string>Категория</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="detailsButton">
+     <property name="text">
+      <string>Подробнее</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

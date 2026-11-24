@@ -1,14 +1,12 @@
 import hashlib
 import hmac
-import os
 import secrets
 from pathlib import Path
-from turtledemo.sorting_animate import start_ssort
 
 import gridfs
 import mysql.connector
 from bson import ObjectId
-from pymongo import MongoClient, cursor
+from pymongo import MongoClient
 
 
 def _hash_password(password, salt=None):
@@ -31,18 +29,18 @@ class Database:
         )
 
         self.mongo_client = MongoClient("mongodb://localhost:27017")
-        self.mongo_db =self.mongo_client["4vito"]
+        self.mongo_db = self.mongo_client["4vito"]
         self.files = gridfs.GridFS(self.mongo_db)
 
     def register(self, login, email, password):
         cursor = self.mysql.cursor()
         try:
             cursor.execute(
-            "SELECT id_user FROM users WHERE name = %s OR email = %s",
-            (login, email.lower()),
-        )
+                "SELECT id_users FROM users WHERE name = %s OR email = %s",
+                (login, email.lower()),
+            )
             if cursor.fetchone():
-                raise ValueError("Этот логи или email уже существуют")
+                raise ValueError("Этот логин или email уже существуют")
             cursor.execute(
                 "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
                 (login, email.lower(), _hash_password(password)),
@@ -56,7 +54,7 @@ class Database:
         try:
             cursor.execute(
                 "select id_users as id, name, email, password from users "
-                "where email - %s or name = %s",
+                "where email = %s or name = %s",
                 (login_or_email.lower(), login_or_email),
             )
             user = cursor.fetchone()
@@ -82,9 +80,9 @@ class Database:
             try:
                 cursor.execute(
                     "insert into product"
-                    "(user_id, title, description, price, category, photos, photo_ids) "
-                    "values (%s, %s, %s, %s, %s, active, %s)",
-                    (user_id, title, description, price, category, ",".join(photo_ids)),
+                    "(user_id, title, description, price, category, status, photo_ids) "
+                    "values (%s, %s, %s, %s, %s, %s, %s)",
+                    (user_id, title, description, price, category, "active", ",".join(photo_ids)),
                 )
                 self.mysql.commit()
             finally:
@@ -93,23 +91,23 @@ class Database:
             self.delete_photos(photo_ids)
             raise
 
-    def product(self, user_id=None):
+    def ads(self, user_id=None):
         cursor = self.mysql.cursor(dictionary=True)
         try:
             query = """
-                product.id_product AS id, product.user_id,
+                select product.id_product AS id, product.user_id,
                        product.title, product.description, product.price,
                        product.category, product.photo_ids,
                        COALESCE(users.name, 'Продавец') AS seller
                 from product
-                left join users on users.id_user = product.user_id
+                left join users on users.id_users = product.user_id
                 where product.status='active'
             """
             params = ()
             if user_id is not None:
-                query += "and product.user_id = %s"
+                query += " AND product.user_id = %s"
                 params = (user_id,)
-            query += "order by product.id_product desc"
+            query += " ORDER BY product.id_product DESC"
             cursor.execute(query, params)
             return cursor.fetchall()
         finally:
@@ -122,7 +120,7 @@ class Database:
         cursor = self.mysql.cursor(dictionary=True)
         try:
             cursor.execute(
-                "select photo_ids from product"
+                "select photo_ids from product "
                 "where id_product = %s and user_id = %s",
                 (ad_id, owner_id),
             )
@@ -146,8 +144,8 @@ class Database:
         try:
             cursor.execute(
                 "update product set status = 'sold' "
-                "where id_product = %s and (user_id is null or user_id <> %s "
-                "and starus= 'active')",
+                "where id_product = %s and status = 'active' "
+                "and (user_id is null or user_id <> %s)",
                 (ad_id, buyer_id),
             )
             self.mysql.commit()
@@ -158,12 +156,11 @@ class Database:
     def delete_photos(self, photo_ids):
         for photo_id in photo_ids:
             if not photo_id:
-                if not photo_id:
-                    continue
-                try:
-                    self.files.delete(ObjectId(photo_id))
-                except Exception:
-                    pass
+                continue
+            try:
+                self.files.delete(ObjectId(photo_id))
+            except Exception:
+                pass
 
     def close(self):
         self.mysql.close()
