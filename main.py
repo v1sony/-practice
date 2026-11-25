@@ -327,7 +327,7 @@ class MainWindow(QMainWindow):
         card_ui.categoryLabel.setText(ad["category"])
         self.set_card_photo(card_ui.photoLabel, ad.get("photo_ids", ""))
         card_ui.detailsButton.clicked.connect(
-            lambda checked = False, item = ad: ProductWindow(
+            lambda checked=False, item=ad: ProductWindow(
                 self.storage, item, self.add_to_cart, self
             ).exec()
         )
